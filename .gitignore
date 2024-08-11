@@ -1,6 +1,7 @@
+### H2 FileDB ###
 data/
+*.db
 
-HELP.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
