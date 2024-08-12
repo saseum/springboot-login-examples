@@ -164,4 +164,3 @@ public class SessionLoginController {
         model.addAttribute("pageName", "세션 로그인");
     }
 }
-//D156CA87325AC89ABA494E2BE134C538//B79510F343A847AD5C04FACEAF728F0A

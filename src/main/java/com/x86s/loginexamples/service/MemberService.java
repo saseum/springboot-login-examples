@@ -5,6 +5,7 @@ import com.x86s.loginexamples.domain.member.dto.JoinRequest;
 import com.x86s.loginexamples.domain.member.dto.LoginRequest;
 import com.x86s.loginexamples.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public boolean checkLoginIdDuplicate(String loginId) {
         return memberRepository.existsByLoginId(loginId);
@@ -32,7 +34,7 @@ public class MemberService {
             return null;
         }
 
-        if(!findMember.getPassword().equals(loginRequest.getPassword())) {
+        if(!bCryptPasswordEncoder.matches(loginRequest.getPassword(), findMember.getPassword())) {
             return null;
         }
 
@@ -44,5 +46,21 @@ public class MemberService {
 
         Optional<Member> findMember = memberRepository.findById(memberId);
         return findMember.orElse(null);
+    }
+
+    // BCryptPasswordEncoder를 통해서 비밀번호 암호화 작업 추가한 회원가입 로직
+    public void securityJoin(JoinRequest joinRequest) {
+        if (memberRepository.existsByLoginId(joinRequest.getLoginId())) {
+            return;
+        }
+
+        joinRequest.setPassword(bCryptPasswordEncoder.encode(joinRequest.getPassword()));
+
+        Member saveMember = memberRepository.save(joinRequest.toEntity());
+    }
+
+    public Member getLoginMemberByLoginId(String loginId) {
+        // TODO: Password 검증 필요한지 고민 필요
+        return memberRepository.findByLoginId(loginId);
     }
 }
